@@ -1,4 +1,4 @@
-package rogotulka.org.foxfilter.graphic;
+package org.rogotulka.foxfilter.graphic;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
@@ -7,7 +7,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * Created by a.rozhkova on 29.07.2015.
+ * Custom GLRenderer
  */
 public class FilterGLRenderer implements GLSurfaceView.Renderer {
     @Override
