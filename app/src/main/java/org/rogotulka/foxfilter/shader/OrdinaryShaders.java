@@ -3,7 +3,7 @@ package org.rogotulka.foxfilter.shader;
 /**
  *
  */
-public class OrdinaryShaders {
+public class OrdinaryShaders implements Shader{
 
     protected final static String mVertexShader =
                     "uniform mat4 uMVPMatrix;" +
