@@ -1,17 +1,30 @@
 package rogotulka.org.foxfilter;
 
+import android.app.Activity;
+import android.opengl.GLSurfaceView;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import rogotulka.org.foxfilter.graphic.FilterGLRenderer;
 
-public class MainActivity extends ActionBarActivity {
+
+public class MainActivity extends Activity {
+
+    private GLSurfaceView mGLSurfaceView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+        mGLSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
+        mGLSurfaceView.setRenderer(new FilterGLRenderer());
+        mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+
     }
 
     @Override
@@ -21,18 +34,5 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }
