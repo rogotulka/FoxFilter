@@ -1,4 +1,4 @@
-package rogotulka.org.foxfilter;
+package org.rogotulka.foxfilter;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -5,7 +5,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "rogotulka.org.foxfilter"
+        applicationId "org.rogotulka.foxfilter"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
