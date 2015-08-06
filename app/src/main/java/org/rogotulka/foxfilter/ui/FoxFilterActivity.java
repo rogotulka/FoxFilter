@@ -1,10 +1,11 @@
-package org.rogotulka.foxfilter;
+package org.rogotulka.foxfilter.ui;
 
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Menu;
 
+import org.rogotulka.foxfilter.R;
 import org.rogotulka.foxfilter.graphic.FilterGLRenderer;
 import org.rogotulka.foxfilter.graphic.FilterGLSurfaceView;
 
@@ -12,6 +13,7 @@ import org.rogotulka.foxfilter.graphic.FilterGLSurfaceView;
 public class FoxFilterActivity extends Activity {
 
     private FilterGLSurfaceView mGLSurfaceView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

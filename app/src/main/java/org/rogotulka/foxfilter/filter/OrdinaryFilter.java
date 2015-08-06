@@ -1,12 +1,12 @@
-package org.rogotulka.foxfilter.shader;
+package org.rogotulka.foxfilter.filter;
 
 /**
- *
+ * Created by user on 06.08.2015.
  */
-public class OrdinaryShaders implements Shader{
+public class OrdinaryFilter {
 
-    protected static String mVertexShader =
-                    "uniform mat4 uMVPMatrix;" +
+    public static final String VERTEX_SHADER =
+            "uniform mat4 uMVPMatrix;" +
                     "attribute vec4 vPosition;" +
                     "attribute vec4 a_Color;" +
                     "attribute vec2 a_texCoord;" +
@@ -18,8 +18,8 @@ public class OrdinaryShaders implements Shader{
                     "  v_Color = a_Color;" +
                     "}";
 
-    protected static String mFragmentShader =
-                    "precision mediump float;" +
+    public static final String FRAGMENT_SHADER =
+            "precision mediump float;" +
                     "varying vec2 v_texCoord;" +
                     "varying vec4 v_Color;" +
                     "uniform sampler2D s_texture;" +
@@ -28,13 +28,6 @@ public class OrdinaryShaders implements Shader{
                     "  gl_FragColor.rgb *= v_Color.a;" +
                     "}";
 
-    @Override
-    public String getVertexShader() {
-        return mVertexShader;
-    }
 
-    @Override
-    public String getFragmentShader() {
-        return mFragmentShader;
-    }
+
 }
