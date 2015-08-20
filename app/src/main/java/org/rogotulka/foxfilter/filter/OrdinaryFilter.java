@@ -3,7 +3,7 @@ package org.rogotulka.foxfilter.filter;
 /**
  * Created by user on 06.08.2015.
  */
-public class OrdinaryFilter {
+public class OrdinaryFilter implements Filter{
 
     public static final String VERTEX_SHADER =
             "uniform mat4 uMVPMatrix;" +
@@ -29,5 +29,8 @@ public class OrdinaryFilter {
                     "}";
 
 
+        @Override
+        public void filter() {
 
+        }
 }

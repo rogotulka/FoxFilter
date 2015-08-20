@@ -10,6 +10,7 @@ import android.util.AttributeSet;
  */
 public class FilterGLSurfaceView extends GLSurfaceView {
 
+
     public FilterGLSurfaceView(Context context) {
         super(context);
         // setup
