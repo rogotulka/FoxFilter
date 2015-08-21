@@ -13,7 +13,4 @@ public class ColorFilter extends OrdinaryFilter {
 
     }
 
-
-
-
 }
