@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.Menu;
 
 import org.rogotulka.foxfilter.R;
-import org.rogotulka.foxfilter.filter.OrdinaryFilter;
 import org.rogotulka.foxfilter.graphic.FilterGLRenderer;
 import org.rogotulka.foxfilter.graphic.FilterGLSurfaceView;
 
@@ -24,11 +23,10 @@ public class FoxFilterActivity extends Activity {
         setContentView(R.layout.activity_main);
         mGLSurfaceView = (FilterGLSurfaceView) findViewById(R.id.surfaceView);
         mGLSurfaceView.setEGLContextClientVersion(2);
-        FilterGLRenderer renderer = new FilterGLRenderer(new OrdinaryFilter());
+        FilterGLRenderer renderer = new FilterGLRenderer(getApplicationContext());
         //renderer.setImageBitmap();
-        renderer.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.fox));
+       // renderer.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.adium));
         mGLSurfaceView.setRenderer(renderer);
-        mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
 
     }

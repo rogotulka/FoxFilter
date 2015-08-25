@@ -16,10 +16,9 @@ import org.rogotulka.foxfilter.filter.OrdinaryFilter;
 
 public class FilterGLSurfaceView extends GLSurfaceView {
 
-
-
-
     public FilterGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
+
+
 }

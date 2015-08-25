@@ -1,24 +1,20 @@
 package org.rogotulka.foxfilter.graphic;
 
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.opengl.Matrix;
 
-import org.rogotulka.foxfilter.filter.Filter;
-import org.rogotulka.foxfilter.filter.OrdinaryFilter;
+import org.rogotulka.foxfilter.R;
 import org.rogotulka.foxfilter.shader.ShaderUtils;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -28,82 +24,281 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class FilterGLRenderer implements GLSurfaceView.Renderer {
 
-    private Bitmap mBitmap;
-    private Filter mFilter;
+    // Our matrices
+    private final float[] mtrxProjection = new float[16];
+    private final float[] mtrxView = new float[16];
+    private final float[] mtrxProjectionAndView = new float[16];
 
-    public FilterGLRenderer() {
-        mFilter = new OrdinaryFilter();
+    // Geometric variables
+    public static float vertices[];
+    public static float colors[];
+    public static short indices[];
+    public static float uvs[];
+    public FloatBuffer vertexBuffer;
+    public ShortBuffer drawListBuffer;
+    public FloatBuffer uvBuffer;
+    public FloatBuffer colorBuffer;
+
+    // Our screenresolution
+    float	mScreenWidth = 1280;
+    float	mScreenHeight = 768;
+
+    // Misc
+    Context mContext;
+    long mLastTime;
+    int mProgram;
+
+
+    public FilterGLRenderer(Context c)
+    {
+        mContext = c;
+        mLastTime = System.currentTimeMillis() + 100;
     }
 
-    //----------------------------------------------------------------------------------------------
-    /**
-     * GLSurfaceView.Renderer implementation
-     */
-    //----------------------------------------------------------------------------------------------
+    public void onPause()
+    {
+		/* Do stuff to pause the renderer */
+    }
+
+    public void onResume()
+    {
+		/* Do stuff to resume the renderer */
+        mLastTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void onDrawFrame(GL10 unused) {
+
+        // Get the current time
+        long now = System.currentTimeMillis();
+
+        // We should make sure we are valid and sane
+        if (mLastTime > now) return;
+
+        // Get the amount of time the last frame took.
+        long elapsed = now - mLastTime;
+
+        // Update our example
+
+        // Render our example
+        Render(mtrxProjectionAndView);
+
+        // Save the current time to see how long it took :).
+        mLastTime = now;
+
+    }
+
+    private void Render(float[] m) {
+
+        // clear Screen and Depth Buffer, we have set the clear color as black.
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+        // get handle to vertex shader's vPosition member
+        int mPositionHandle = GLES20.glGetAttribLocation(ShaderUtils.sp_Image, "vPosition");
+
+        // Enable generic vertex attribute array
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
+
+        // Prepare the triangle coordinate data
+        GLES20.glVertexAttribPointer(mPositionHandle, 3,
+                GLES20.GL_FLOAT, false,
+                0, vertexBuffer);
+
+        // get handle to vertex shader's vPosition member
+        int mColorHandle = GLES20.glGetAttribLocation(ShaderUtils.sp_Image, "a_Color");
+
+        // Enable generic vertex attribute array
+        GLES20.glEnableVertexAttribArray(mColorHandle);
+
+        // Prepare the triangle coordinate data
+        GLES20.glVertexAttribPointer(mColorHandle, 4,
+                GLES20.GL_FLOAT, false,
+                0, colorBuffer);
+
+        // Get handle to texture coordinates location
+        int mTexCoordLoc = GLES20.glGetAttribLocation(ShaderUtils.sp_Image, "a_texCoord" );
+
+        // Enable generic vertex attribute array
+        GLES20.glEnableVertexAttribArray ( mTexCoordLoc );
+
+        // Prepare the texturecoordinates
+        GLES20.glVertexAttribPointer(mTexCoordLoc, 2, GLES20.GL_FLOAT,
+                false,
+                0, uvBuffer);
+
+        // Get handle to shape's transformation matrix
+        int mtrxhandle = GLES20.glGetUniformLocation(ShaderUtils.sp_Image, "uMVPMatrix");
+
+        // Apply the projection and view transformation
+        GLES20.glUniformMatrix4fv(mtrxhandle, 1, false, m, 0);
+
+        // Get handle to textures locations
+        int mSamplerLoc = GLES20.glGetUniformLocation (ShaderUtils.sp_Image, "s_texture" );
+
+        // Set the sampler texture unit to 0, where we have saved the texture.
+        GLES20.glUniform1i ( mSamplerLoc, 0);
+
+        // Draw the triangle
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
+                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+
+        // Disable vertex array
+        GLES20.glDisableVertexAttribArray(mPositionHandle);
+        GLES20.glDisableVertexAttribArray(mColorHandle);
+        GLES20.glDisableVertexAttribArray(mTexCoordLoc);
+
+    }
 
 
-    private static final float uvs[] = new float[] {
-            0.0f, 0.0f,
-            0.0f, 1.0f,
-            1.0f, 1.0f,
-            1.0f, 0.0f
-    };
+    @Override
+    public void onSurfaceChanged(GL10 gl, int width, int height) {
+
+        // We need to know the current width and height.
+        mScreenWidth = width;
+        mScreenHeight = height;
+
+        // Redo the Viewport, making it fullscreen.
+        GLES20.glViewport(0, 0, (int)mScreenWidth, (int)mScreenHeight);
+
+        // Clear our matrices
+        for(int i=0;i<16;i++)
+        {
+            mtrxProjection[i] = 0.0f;
+            mtrxView[i] = 0.0f;
+            mtrxProjectionAndView[i] = 0.0f;
+        }
+
+        // Setup our screen width and height for normal sprite translation.
+        Matrix.orthoM(mtrxProjection, 0, 0f, mScreenWidth, 0.0f, mScreenHeight, 0, 50);
+
+        // Set the camera position (View matrix)
+        Matrix.setLookAtM(mtrxView, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+
+        // Calculate the projection and view transformation
+        Matrix.multiplyMM(mtrxProjectionAndView, 0, mtrxProjection, 0, mtrxView, 0);
+
+    }
+
+    @Override
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        //add ordinary shader
+        // Create the triangles
+        SetupTriangle();
+        // Create the image information
+        SetupImage();
+
+        // Set the clear color to black
+        GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1);
+
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
+        // Create the shaders, solid color
+        int vertexShader = ShaderUtils.loadShader(GLES20.GL_VERTEX_SHADER, ShaderUtils.vs_SolidColor);
+        int fragmentShader = ShaderUtils.loadShader(GLES20.GL_FRAGMENT_SHADER, ShaderUtils.fs_SolidColor);
+
+        ShaderUtils.sp_SolidColor = GLES20.glCreateProgram();             // create empty OpenGL ES Program
+        GLES20.glAttachShader(ShaderUtils.sp_SolidColor, vertexShader);   // add the vertex shader to program
+        GLES20.glAttachShader(ShaderUtils.sp_SolidColor, fragmentShader); // add the fragment shader to program
+        GLES20.glLinkProgram(ShaderUtils.sp_SolidColor);                  // creates OpenGL ES program executables
+
+        // Create the shaders, images
+        vertexShader = ShaderUtils.loadShader(GLES20.GL_VERTEX_SHADER, ShaderUtils.vs_Image);
+        fragmentShader = ShaderUtils.loadShader(GLES20.GL_FRAGMENT_SHADER, ShaderUtils.fs_Image);
+
+        ShaderUtils.sp_Image = GLES20.glCreateProgram();             // create empty OpenGL ES Program
+        GLES20.glAttachShader(ShaderUtils.sp_Image, vertexShader);   // add the vertex shader to program
+        GLES20.glAttachShader(ShaderUtils.sp_Image, fragmentShader); // add the fragment shader to program
+        GLES20.glLinkProgram(ShaderUtils.sp_Image);                  // creates OpenGL ES program executables
 
 
+        // Set our shader programm
+        GLES20.glUseProgram(ShaderUtils.sp_Image);
+    }
 
-    private int mTextureId = -1;
+    public void SetupImage()
+    {
+        // Create our UV coordinates.
+        uvs = new float[] {
+                0.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f
+        };
 
-    //private FloatBuffer verticesBuffer;
-    private FloatBuffer textureBuffer;
-
-    private void initBuffers(){
+        // The texture buffer
         ByteBuffer bb = ByteBuffer.allocateDirect(uvs.length * 4);
         bb.order(ByteOrder.nativeOrder());
-        textureBuffer = bb.asFloatBuffer();
-        textureBuffer.put(uvs);
-        textureBuffer.position(0);
-    }
+        uvBuffer = bb.asFloatBuffer();
+        uvBuffer.put(uvs);
+        uvBuffer.position(0);
 
-    private void loadTexture(){
-        int[] textures = new int[1];
-        GLES20.glGenTextures(1, textures, 0);
+        // Generate Textures, if more needed, alter these numbers.
+        int[] texturenames = new int[1];
+        GLES20.glGenTextures(1, texturenames, 0);
+
+        // Retrieve our image from resources.
+        //int id = mContext.getResources().getIdentifier("drawable/ic_launcher", null, mContext.getPackageName());
+
+        // Temporary create a bitmap
+        Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fox);
+
+        // Bind texture to texturename
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
-        mTextureId = textures[0];
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
 
+        // Set filtering
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mBitmap, 0);
-        mBitmap.recycle();
-    }
+        // Load the bitmap into the bound texture.
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-
-    @Override
-    public void onSurfaceCreated(final GL10 unused, final EGLConfig config) {
-        initBuffers();
-        loadTexture();
-
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1);
-        //mFilter.load();
-        GLES20.glUseProgram(mFilter.load());
-    }
-
-    @Override
-    public void onSurfaceChanged(final GL10 gl, final int width, final int height) {
+        // We are done using the bitmap so we should recycle it.
+        bmp.recycle();
 
     }
 
-    @Override
-    public void onDrawFrame(final GL10 gl) {
+    public void SetupTriangle()
+    {
+        // We have to create the vertices of our triangle.
+        vertices = new float[]
+                {0.0f, mScreenWidth, 0.0f,
+                        0.0f, mScreenHeight, 0.0f,
+                        mScreenHeight, mScreenHeight, 0.0f,
+                        mScreenHeight, mScreenWidth, 0.0f,
+                };
 
-    }
+        colors = new float[]
+                {1f, 0f, 1f, 1f,
+                        1f, 0f, 1f, 1f,
+                        1f, 0f, 1f, 1f,
+                        1f, 0f, 1f, 1f,
+                };
 
-    public void setBitmap(Bitmap bitmap) {
-        mBitmap = bitmap;
-    }
+        indices = new short[] {0, 1, 2, 0, 2, 3}; // The order of vertexrendering.
 
-    public void setFilter(Filter filter) {
-        mFilter = filter;
+        // The vertex buffer.
+        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        vertexBuffer = bb.asFloatBuffer();
+        vertexBuffer.put(vertices);
+        vertexBuffer.position(0);
+
+        // initialize byte buffer for the draw list
+        ByteBuffer dlb = ByteBuffer.allocateDirect(indices.length * 2);
+        dlb.order(ByteOrder.nativeOrder());
+        drawListBuffer = dlb.asShortBuffer();
+        drawListBuffer.put(indices);
+        drawListBuffer.position(0);
+
+        ByteBuffer cb = ByteBuffer.allocateDirect(colors.length * 4);
+        cb.order(ByteOrder.nativeOrder());
+        colorBuffer = cb.asFloatBuffer();
+        colorBuffer.put(colors);
+        colorBuffer.position(0);
+
+
+
     }
 }
