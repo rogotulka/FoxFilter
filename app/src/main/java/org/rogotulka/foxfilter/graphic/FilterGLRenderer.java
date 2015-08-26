@@ -24,24 +24,23 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class FilterGLRenderer implements GLSurfaceView.Renderer {
 
-    // Our matrices
-    private final float[] mtrxProjection = new float[16];
-    private final float[] mtrxView = new float[16];
-    private final float[] mtrxProjectionAndView = new float[16];
-
     // Geometric variables
     public static float vertices[];
     public static float colors[];
     public static short indices[];
     public static float uvs[];
+    // Our matrices
+    private final float[] mtrxProjection = new float[16];
+    private final float[] mtrxView = new float[16];
+    private final float[] mtrxProjectionAndView = new float[16];
     public FloatBuffer vertexBuffer;
     public ShortBuffer drawListBuffer;
     public FloatBuffer uvBuffer;
     public FloatBuffer colorBuffer;
 
     // Our screenresolution
-    float	mScreenWidth = 1280;
-    float	mScreenHeight = 768;
+    float mScreenWidth = 1920;
+    float mScreenHeight =1080;
 
     // Misc
     Context mContext;
@@ -49,20 +48,17 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
     int mProgram;
 
 
-    public FilterGLRenderer(Context c)
-    {
+    public FilterGLRenderer(Context c) {
         mContext = c;
         mLastTime = System.currentTimeMillis() + 100;
     }
 
-    public void onPause()
-    {
-		/* Do stuff to pause the renderer */
+    public void onPause() {
+        /* Do stuff to pause the renderer */
     }
 
-    public void onResume()
-    {
-		/* Do stuff to resume the renderer */
+    public void onResume() {
+        /* Do stuff to resume the renderer */
         mLastTime = System.currentTimeMillis();
     }
 
@@ -116,12 +112,12 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
                 0, colorBuffer);
 
         // Get handle to texture coordinates location
-        int mTexCoordLoc = GLES20.glGetAttribLocation(ShaderUtils.sp_Image, "a_texCoord" );
+        int mTexCoordLoc = GLES20.glGetAttribLocation(ShaderUtils.sp_Image, "a_texCoord");
 
         // Enable generic vertex attribute array
-        GLES20.glEnableVertexAttribArray ( mTexCoordLoc );
+        GLES20.glEnableVertexAttribArray(mTexCoordLoc);
 
-        // Prepare the texturecoordinates
+        // Prepare the texture coordinates
         GLES20.glVertexAttribPointer(mTexCoordLoc, 2, GLES20.GL_FLOAT,
                 false,
                 0, uvBuffer);
@@ -133,10 +129,10 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glUniformMatrix4fv(mtrxhandle, 1, false, m, 0);
 
         // Get handle to textures locations
-        int mSamplerLoc = GLES20.glGetUniformLocation (ShaderUtils.sp_Image, "s_texture" );
+        int mSamplerLoc = GLES20.glGetUniformLocation(ShaderUtils.sp_Image, "s_texture");
 
         // Set the sampler texture unit to 0, where we have saved the texture.
-        GLES20.glUniform1i ( mSamplerLoc, 0);
+        GLES20.glUniform1i(mSamplerLoc, 0);
 
         // Draw the triangle
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
@@ -158,11 +154,10 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
         mScreenHeight = height;
 
         // Redo the Viewport, making it fullscreen.
-        GLES20.glViewport(0, 0, (int)mScreenWidth, (int)mScreenHeight);
+        GLES20.glViewport(0, 0, (int) mScreenWidth, (int) mScreenHeight);
 
         // Clear our matrices
-        for(int i=0;i<16;i++)
-        {
+        for (int i = 0; i < 16; i++) {
             mtrxProjection[i] = 0.0f;
             mtrxView[i] = 0.0f;
             mtrxProjectionAndView[i] = 0.0f;
@@ -193,7 +188,6 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
-        // Create the shaders, solid color
         int vertexShader = ShaderUtils.loadShader(GLES20.GL_VERTEX_SHADER, ShaderUtils.vs_SolidColor);
         int fragmentShader = ShaderUtils.loadShader(GLES20.GL_FRAGMENT_SHADER, ShaderUtils.fs_SolidColor);
 
@@ -202,7 +196,7 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glAttachShader(ShaderUtils.sp_SolidColor, fragmentShader); // add the fragment shader to program
         GLES20.glLinkProgram(ShaderUtils.sp_SolidColor);                  // creates OpenGL ES program executables
 
-        // Create the shaders, images
+
         vertexShader = ShaderUtils.loadShader(GLES20.GL_VERTEX_SHADER, ShaderUtils.vs_Image);
         fragmentShader = ShaderUtils.loadShader(GLES20.GL_FRAGMENT_SHADER, ShaderUtils.fs_Image);
 
@@ -210,20 +204,17 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glAttachShader(ShaderUtils.sp_Image, vertexShader);   // add the vertex shader to program
         GLES20.glAttachShader(ShaderUtils.sp_Image, fragmentShader); // add the fragment shader to program
         GLES20.glLinkProgram(ShaderUtils.sp_Image);                  // creates OpenGL ES program executables
-
-
-        // Set our shader programm
         GLES20.glUseProgram(ShaderUtils.sp_Image);
     }
 
-    public void SetupImage()
-    {
-        // Create our UV coordinates.
-        uvs = new float[] {
+    public void SetupImage() {
+
+        uvs = new float[]{
+                1.0f, 1.0f,
+                1.0f, 0.0f,
                 0.0f, 0.0f,
                 0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f
+
         };
 
         // The texture buffer
@@ -259,33 +250,30 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
 
     }
 
-    public void SetupTriangle()
-    {
-        // We have to create the vertices of our triangle.
-        vertices = new float[]
-                {0.0f, mScreenWidth, 0.0f,
-                        0.0f, mScreenHeight, 0.0f,
-                        mScreenHeight, mScreenHeight, 0.0f,
-                        mScreenHeight, mScreenWidth, 0.0f,
-                };
+    public void SetupTriangle() {
 
-        colors = new float[]
-                {1f, 0f, 1f, 1f,
-                        1f, 0f, 1f, 1f,
-                        1f, 0f, 1f, 1f,
-                        1f, 0f, 1f, 1f,
-                };
+        vertices = new float[]{
+                0.0f, 0f, 0.0f,
+                0f, mScreenHeight, 0.0f,
+                mScreenWidth, mScreenHeight, 0.0f,
+                mScreenWidth, 0f, 0.0f,
+        };
 
-        indices = new short[] {0, 1, 2, 0, 2, 3}; // The order of vertexrendering.
+        colors = new float[]{
+                1f, 0f, 1f, 1f,
+                1f, 0f, 1f, 1f,
+                1f, 0f, 1f, 1f,
+                1f, 0f, 1f, 1f,
+        };
 
-        // The vertex buffer.
+        indices = new short[]{0, 1, 2, 2, 3, 0};
+
         ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
         bb.order(ByteOrder.nativeOrder());
         vertexBuffer = bb.asFloatBuffer();
         vertexBuffer.put(vertices);
         vertexBuffer.position(0);
 
-        // initialize byte buffer for the draw list
         ByteBuffer dlb = ByteBuffer.allocateDirect(indices.length * 2);
         dlb.order(ByteOrder.nativeOrder());
         drawListBuffer = dlb.asShortBuffer();
@@ -297,8 +285,5 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
         colorBuffer = cb.asFloatBuffer();
         colorBuffer.put(colors);
         colorBuffer.position(0);
-
-
-
     }
 }
