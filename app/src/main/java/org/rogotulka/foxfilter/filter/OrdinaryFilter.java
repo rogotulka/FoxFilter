@@ -11,11 +11,11 @@ import java.nio.FloatBuffer;
  */
 public class OrdinaryFilter extends Filter {
 
-    public static String VERTEX_SHADER;
+    public  String VERTEX_SHADER;
 
-    public static String FRAGMENT_SHADER;
+    public  String FRAGMENT_SHADER;
 
-    static {
+     {
         VERTEX_SHADER =
                 "uniform mat4 uMVPMatrix;" +
                         "attribute vec4 vPosition;" +
@@ -33,6 +33,8 @@ public class OrdinaryFilter extends Filter {
                 "void main() {" +
                 "  gl_FragColor = texture2D( s_texture, v_texCoord );" +
                 "}";
+
+
     }
 
 
