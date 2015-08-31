@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
+import org.rogotulka.foxfilter.filter.Filter;
 import org.rogotulka.foxfilter.filter.OrdinaryFilter;
 import org.rogotulka.foxfilter.shader.ShaderUtils;
 
@@ -61,29 +62,29 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
     private void Render(float[] m) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        int mPositionHandle = GLES20.glGetAttribLocation(ShaderUtils.sp_Image, "vPosition");
+        int mPositionHandle = GLES20.glGetAttribLocation(Filter.mGLProgId, "vPosition");
         GLES20.glEnableVertexAttribArray(mPositionHandle);
         GLES20.glVertexAttribPointer(mPositionHandle, 3,
                 GLES20.GL_FLOAT, false,
                 0, vertexBuffer);
 
-        int mColorHandle = GLES20.glGetAttribLocation(ShaderUtils.sp_Image, "a_Color");
+        int mColorHandle = GLES20.glGetAttribLocation(Filter.mGLProgId, "a_Color");
         GLES20.glEnableVertexAttribArray(mColorHandle);
         GLES20.glVertexAttribPointer(mColorHandle, 4,
                 GLES20.GL_FLOAT, false,
                 0, colorBuffer);
 
-        int mTexCoordLoc = GLES20.glGetAttribLocation(ShaderUtils.sp_Image, "a_texCoord");
+        int mTexCoordLoc = GLES20.glGetAttribLocation(Filter.mGLProgId, "a_texCoord");
         GLES20.glEnableVertexAttribArray(mTexCoordLoc);
         GLES20.glVertexAttribPointer(mTexCoordLoc, 2, GLES20.GL_FLOAT,
                 false,
                 0, uvBuffer);
 
-        int mtrxhandle = GLES20.glGetUniformLocation(ShaderUtils.sp_Image, "uMVPMatrix");
+        int mtrxhandle = GLES20.glGetUniformLocation(Filter.mGLProgId, "uMVPMatrix");
         GLES20.glUniformMatrix4fv(mtrxhandle, 1, false, m, 0);
 
 
-        int mSamplerLoc = GLES20.glGetUniformLocation(ShaderUtils.sp_Image, "s_texture");
+        int mSamplerLoc = GLES20.glGetUniformLocation(Filter.mGLProgId, "s_texture");
         GLES20.glUniform1i(mSamplerLoc, 0);
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
                 GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
@@ -123,14 +124,14 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
-        int vertexShader = ShaderUtils.loadShader(GLES20.GL_VERTEX_SHADER, ShaderUtils.vs_Image);
-        int fragmentShader = ShaderUtils.loadShader(GLES20.GL_FRAGMENT_SHADER, ShaderUtils.fs_Image);
+//        int vertexShader = ShaderUtils.loadShader(GLES20.GL_VERTEX_SHADER, ShaderUtils.vs_Image);
+//        int fragmentShader = ShaderUtils.loadShader(GLES20.GL_FRAGMENT_SHADER, ShaderUtils.fs_Image);
+//
+//        ShaderUtils.sp_Image = GLES20.glCreateProgram();             // create empty OpenGL ES Program
+//        GLES20.glAttachShader(ShaderUtils.sp_Image, vertexShader);   // add the vertex shader to program
+//        GLES20.glAttachShader(ShaderUtils.sp_Image, fragmentShader); // add the fragment shader to program
 
-        ShaderUtils.sp_Image = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-        GLES20.glAttachShader(ShaderUtils.sp_Image, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(ShaderUtils.sp_Image, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(ShaderUtils.sp_Image);                  // creates OpenGL ES program executables
-        GLES20.glUseProgram(ShaderUtils.sp_Image);
+        GLES20.glUseProgram(mFilter.load());
     }
 
     public void SetupImage() {
