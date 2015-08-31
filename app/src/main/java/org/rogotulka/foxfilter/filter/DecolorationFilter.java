@@ -1,6 +1,6 @@
 package org.rogotulka.foxfilter.filter;
 
-public class ColorFilter extends OrdinaryFilter {
+public class DecolorationFilter extends OrdinaryFilter {
 
     {
         VERTEX_SHADER =
