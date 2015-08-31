@@ -1,15 +1,6 @@
 package org.rogotulka.foxfilter.filter;
 
-import android.graphics.Color;
-import android.opengl.GLES20;
-
-import org.rogotulka.foxfilter.shader.ShaderUtils;
-
-/**
- * Created by user on 06.08.2015.
- */
 public class ColorFilter extends OrdinaryFilter {
-
 
     {
         VERTEX_SHADER =
@@ -28,11 +19,8 @@ public class ColorFilter extends OrdinaryFilter {
                         "uniform sampler2D s_texture;" +
                         "void main() {" +
                         "  lowp vec4 base = texture2D( s_texture, v_texCoord );" +
-                        "  float linear_luminance =  0.2126 * base.r + 0.7125 * base.g + 0.0722 * base.b;"+
+                        "  float linear_luminance =  0.2126 * base.r + 0.7125 * base.g + 0.0722 * base.b;" +
                         "  gl_FragColor = vec4(linear_luminance, linear_luminance, linear_luminance, 1.0);" +
                         "}";
     }
-
-
-
 }

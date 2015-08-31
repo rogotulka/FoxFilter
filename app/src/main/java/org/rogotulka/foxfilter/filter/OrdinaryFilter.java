@@ -6,12 +6,9 @@ import org.rogotulka.foxfilter.shader.ShaderUtils;
 
 import java.nio.FloatBuffer;
 
-/**
- * Created by user on 06.08.2015.
- */
 public class OrdinaryFilter extends Filter {
 
-    public  String VERTEX_SHADER;
+    public static String VERTEX_SHADER;
 
     public  String FRAGMENT_SHADER;
 
@@ -33,8 +30,6 @@ public class OrdinaryFilter extends Filter {
                 "void main() {" +
                 "  gl_FragColor = texture2D( s_texture, v_texCoord );" +
                 "}";
-
-
     }
 
 
