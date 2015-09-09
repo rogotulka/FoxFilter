@@ -8,7 +8,7 @@ import android.opengl.Matrix;
 
 import org.rogotulka.foxfilter.filter.Filter;
 import org.rogotulka.foxfilter.filter.OrdinaryFilter;
-import org.rogotulka.foxfilter.shader.ShaderUtils;
+
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -117,8 +117,8 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        SetupTriangle();
-        SetupImage();
+        setupTriangle();
+        setupImage();
 
         GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1);
         GLES20.glEnable(GLES20.GL_BLEND);
@@ -134,7 +134,7 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glUseProgram(mFilter.load());
     }
 
-    public void SetupImage() {
+    public void setupImage() {
       if(mBitmap == null){
           return;
       }
@@ -166,7 +166,7 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
 
     }
 
-    public void SetupTriangle() {
+    public void setupTriangle() {
 
         vertices = new float[]{
                 0.0f, 0f, 0.0f,
