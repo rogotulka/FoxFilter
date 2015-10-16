@@ -6,9 +6,9 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
+import org.rogotulka.foxfilter.filter.DecolorationFilter;
 import org.rogotulka.foxfilter.filter.Filter;
 import org.rogotulka.foxfilter.filter.OrdinaryFilter;
-
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -23,21 +23,23 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class FilterGLRenderer implements GLSurfaceView.Renderer {
 
-    public static float vertices[];
-    public static float colors[];
-    public static short indices[];
-    public static float uvs[];
+    private static final int TIME_OFFSET = 100;
+
+    private static float vertices[];
+    private static float colors[];
+    private static short indices[];
+    private static float uvs[];
 
     private final float[] mtrxProjection = new float[16];
     private final float[] mtrxView = new float[16];
     private final float[] mtrxProjectionAndView = new float[16];
-    public FloatBuffer vertexBuffer;
-    public ShortBuffer drawListBuffer;
-    public FloatBuffer uvBuffer;
-    public FloatBuffer colorBuffer;
+
+    private FloatBuffer vertexBuffer;
+    private ShortBuffer drawListBuffer;
+    private FloatBuffer uvBuffer;
+    private FloatBuffer colorBuffer;
     private float mBoundWidth = 1000;
     private float mBoundHeight = 1000;
-
     private long mLastTime;
     private int mProgram;
     private OrdinaryFilter mFilter;
@@ -45,8 +47,8 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
 
 
     public FilterGLRenderer() {
-        mFilter = new OrdinaryFilter();
-        mLastTime = System.currentTimeMillis() + 100;
+        mFilter = new DecolorationFilter();
+        mLastTime = System.currentTimeMillis() + TIME_OFFSET;
     }
 
     @Override
@@ -117,27 +119,29 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        setupTriangle();
+        setupVerties();
         setupImage();
 
         GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1);
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
-//        int vertexShader = ShaderUtils.loadShader(GLES20.GL_VERTEX_SHADER, ShaderUtils.vs_Image);
-//        int fragmentShader = ShaderUtils.loadShader(GLES20.GL_FRAGMENT_SHADER, ShaderUtils.fs_Image);
-//
-//        ShaderUtils.sp_Image = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-//        GLES20.glAttachShader(ShaderUtils.sp_Image, vertexShader);   // add the vertex shader to program
-//        GLES20.glAttachShader(ShaderUtils.sp_Image, fragmentShader); // add the fragment shader to program
+/*
+        int vertexShader = ShaderUtils.loadShader(GLES20.GL_VERTEX_SHADER, ShaderUtils.vs_Image);
+        int fragmentShader = ShaderUtils.loadShader(GLES20.GL_FRAGMENT_SHADER, ShaderUtils.fs_Image);
+
+        ShaderUtils.sp_Image = GLES20.glCreateProgram();             // create empty OpenGL ES Program
+        GLES20.glAttachShader(ShaderUtils.sp_Image, vertexShader);   // add the vertex shader to program
+        GLES20.glAttachShader(ShaderUtils.sp_Image, fragmentShader); // add the fragment shader to program
+*/
 
         GLES20.glUseProgram(mFilter.load());
     }
 
-    public void setupImage() {
-      if(mBitmap == null){
-          return;
-      }
+    private void setupImage() {
+        if (mBitmap == null) {
+            return;
+        }
 
 
         uvs = new float[]{
@@ -145,7 +149,6 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
                 1.0f, 0.0f,
                 0.0f, 0.0f,
                 0.0f, 1.0f,
-
         };
 
         ByteBuffer bb = ByteBuffer.allocateDirect(uvs.length * 4);
@@ -154,10 +157,10 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
         uvBuffer.put(uvs);
         uvBuffer.position(0);
 
-        int[] texturenames = new int[1];
-        GLES20.glGenTextures(1, texturenames, 0);
+        int[] textureNames = new int[1];
+        GLES20.glGenTextures(1, textureNames, 0);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[0]);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureNames[0]);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 
@@ -166,7 +169,7 @@ public class FilterGLRenderer implements GLSurfaceView.Renderer {
 
     }
 
-    public void setupTriangle() {
+    private void setupVerties() {
 
         vertices = new float[]{
                 0.0f, 0f, 0.0f,
