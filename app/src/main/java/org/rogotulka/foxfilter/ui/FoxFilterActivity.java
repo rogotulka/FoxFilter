@@ -17,7 +17,7 @@ import java.io.IOException;
 
 public class FoxFilterActivity extends Activity {
 
-    private FilterGLSurfaceView mGLSurfaceView;
+    private FilterGLSurfaceView vGLSurfaceView;
 
 
 
@@ -36,12 +36,12 @@ public class FoxFilterActivity extends Activity {
             
             //// TODO: 29.08.15  
         }
-        mGLSurfaceView = (FilterGLSurfaceView) findViewById(R.id.surfaceView);
-        mGLSurfaceView.setEGLContextClientVersion(2);
+        vGLSurfaceView = (FilterGLSurfaceView) findViewById(R.id.surfaceView);
+        vGLSurfaceView.setEGLContextClientVersion(2);
         FilterGLRenderer renderer = new FilterGLRenderer();
         renderer.setBitmap(bitmap);
        // renderer.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.adium));
-        mGLSurfaceView.setRenderer(renderer);
+        vGLSurfaceView.setRenderer(renderer);
 
 
     }

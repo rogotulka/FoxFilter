@@ -33,21 +33,13 @@ public class OrdinaryFilter extends Filter {
     }
 
 
-    private boolean mIsInitialized;
-    private int mGLAttribPosition;
-    private int mGLAttribTextureCoordinate;
-    private int mGLUniformTexture;
-
-
     @Override
     public void filter(int textureId, FloatBuffer cubeBuffer) {
-
 
     }
 
     @Override
     public int load() {
-        //if(mGLProgId == -1){
         //// TODO: 01.09.15 get rid of not necessary initialized
 
             int vertexShader = ShaderUtils.loadShader(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
@@ -57,7 +49,7 @@ public class OrdinaryFilter extends Filter {
             GLES20.glAttachShader(mGLProgId, vertexShader);
             GLES20.glAttachShader(mGLProgId, fragmentShader);
             GLES20.glLinkProgram(mGLProgId);
-        //}
+
 
         return mGLProgId;
     }
